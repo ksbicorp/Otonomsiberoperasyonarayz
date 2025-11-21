@@ -40,7 +40,45 @@ Uygulamayı başlatmak için:
 python app.py
 ```
 
+veya otomatik kontrol ile:
+
+```bash
+python run.py
+```
+
+**Not:** Tkinter sistem düzeyinde bir GUI kütüphanesidir ve işletim sistemine bağlı olarak ayrıca yüklenmesi gerekebilir:
+
+- **Ubuntu/Debian**: `sudo apt-get install python3-tk`
+- **Fedora**: `sudo dnf install python3-tkinter`
+- **macOS**: Python ile birlikte gelir
+- **Windows**: Python ile birlikte gelir
+
 ## Yapı
+
+### Ekran Görüntüleri
+
+Uygulama şu ekranlardan oluşur:
+
+1. **Splash Screen** (Başlangıç Ekranı)
+   - Animasyonlu logo (M logosu)
+   - İlerleme çubuğu
+   - "Midas Pro" başlığı
+   - Alt başlık: "AUTONOMOUS CYBER OPERATIONS COMMAND CENTER"
+
+2. **Ana Pencere**
+   - Özel başlık çubuğu (macOS stili pencere kontrolleri)
+   - Sol kenar çubuğu (navigasyon)
+   - Ana içerik alanı
+
+3. **Dashboard (Komut Paneli)**
+   - Sol: Ağ grafiği görselleştirmesi (6 kategori)
+   - Sağ: Aktivite ve tehdit istatistikleri
+
+4. **Workflow** (İş Akışı)
+   - Yakında gelecek mesajı
+
+5. **Intelligence** (İstihbarat)
+   - Yakında gelecek mesajı
 
 ### Ana Bileşenler
 
@@ -62,6 +100,41 @@ Orijinal tasarımla aynı renk paleti kullanılmıştır:
 - Kırmızı: `#ff3366`
 - Mavi: `#4a9eff`
 - Mor: `#a855f7`
+
+## Dönüşüm Detayları
+
+Bu Python uygulaması, orijinal React/TypeScript projesinin tam bir dönüşümüdür:
+
+### React → CustomTkinter Eşlemeleri
+
+| React Bileşeni | CustomTkinter Karşılığı | Notlar |
+|---------------|------------------------|--------|
+| `<div>` | `CTkFrame` | Konteyner bileşeni |
+| `<button>` | `CTkButton` | Buton bileşeni |
+| `<span>`, `<p>` | `CTkLabel` | Metin gösterimi |
+| `<canvas>` | `Canvas` (tkinter) | Grafik çizimi için |
+| CSS classes | `fg_color`, `text_color` | Stil özellikleri |
+| `useState` | Sınıf değişkenleri | Durum yönetimi |
+| `useEffect` | `after()` metodu | Animasyonlar için |
+
+### Özellikler
+
+- ✅ Tam renkli tema uyumluluğu
+- ✅ Animasyonlu splash screen
+- ✅ Ağ grafiği görselleştirmesi (Canvas kullanarak)
+- ✅ Responsive layout (flex benzeri yerleşim)
+- ✅ Tab/View geçişleri
+- ✅ Scrollable frame'ler (aktivite akışı için)
+- ✅ Custom başlık çubuğu
+- ✅ Icon-based navigation
+
+### Teknik Notlar
+
+1. **CustomTkinter**: Modern ve kullanımı kolay bir Tkinter wrapper
+2. **Canvas**: Ağ grafiği için native tkinter Canvas kullanıldı
+3. **Animasyonlar**: `after()` metodu ile frame-by-frame animasyon
+4. **Renkler**: Orijinal Tailwind CSS renkleri HEX formatında tanımlandı
+5. **Layout**: Pack geometry manager ile responsive layout
 
 ## Orijinal Proje
 
