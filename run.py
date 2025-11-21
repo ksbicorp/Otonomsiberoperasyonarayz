@@ -49,8 +49,13 @@ def main():
     print()
     
     # Import and run the app
-    from app import main as app_main
-    app_main()
+    try:
+        from app import main as app_main
+        app_main()
+    except Exception as e:
+        print(f"\n✗ Error starting application: {e}")
+        print("\nPlease check that app.py is in the same directory and is valid.")
+        sys.exit(1)
 
 if __name__ == "__main__":
     main()

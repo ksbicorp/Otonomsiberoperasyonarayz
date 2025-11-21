@@ -610,7 +610,7 @@ class ExpertIntelligence(ctk.CTkFrame):
         
         header_label = ctk.CTkLabel(
             header,
-            text="Pen-İş Intelligence",
+            text="Pen-İş Intelligence",  # Note: "Pen-İş" is Turkish for "Pen-work" (Penetration Testing Intelligence)
             font=("Arial", 12),
             text_color=COLORS['text_primary']
         )
@@ -673,9 +673,6 @@ class MidasProApp(ctk.CTk):
         x = (self.winfo_screenwidth() // 2) - (1400 // 2)
         y = (self.winfo_screenheight() // 2) - (850 // 2)
         self.geometry(f"1400x850+{x}+{y}")
-        
-        # Remove default title bar (optional)
-        # self.overrideredirect(True)
         
         self.active_tab = 'command'
         
