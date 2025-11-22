@@ -538,123 +538,499 @@ class CommandPanel(ctk.CTkFrame):
 
 
 class OrchestrationWorkflow(ctk.CTkFrame):
-    """Workflow orchestration view"""
+    """Workflow orchestration view - MIDAS Workflow Editor"""
     
     def __init__(self, parent):
-        super().__init__(parent, fg_color=COLORS['bg_light'])
+        super().__init__(parent, fg_color=COLORS['bg_dark'])
         
-        # Header
-        header = ctk.CTkFrame(self, fg_color='transparent', height=56)
+        # Header with toolbar
+        header = ctk.CTkFrame(self, fg_color=COLORS['bg_medium'], height=56)
         header.pack(fill='x', padx=0, pady=0)
         header.pack_propagate(False)
         
+        # Left side - title
         header_label = ctk.CTkLabel(
             header,
-            text="Workflow Orchestration",
-            font=("Arial", 12),
+            text="MIDAS Workflow Editor | Project: Customer Feedback Analysis",
+            font=("Arial", 11),
             text_color=COLORS['text_primary']
         )
-        header_label.pack(side='left', padx=24, pady=16)
+        header_label.pack(side='left', padx=16, pady=16)
+        
+        # Right side - buttons
+        button_frame = ctk.CTkFrame(header, fg_color='transparent')
+        button_frame.pack(side='right', padx=16)
+        
+        ctk.CTkButton(
+            button_frame,
+            text="💾 Save",
+            width=80,
+            height=28,
+            fg_color='transparent',
+            border_width=1,
+            border_color=COLORS['border'],
+            text_color=COLORS['text_secondary'],
+            font=("Arial", 10),
+            hover_color=COLORS['border']
+        ).pack(side='left', padx=2)
+        
+        ctk.CTkButton(
+            button_frame,
+            text="▶ Deploy",
+            width=80,
+            height=28,
+            fg_color=COLORS['blue'],
+            text_color='white',
+            font=("Arial", 10),
+            hover_color=COLORS['blue']
+        ).pack(side='left', padx=2)
         
         # Separator
         separator = ctk.CTkFrame(self, fg_color=COLORS['border'], height=1)
         separator.pack(fill='x')
         
-        # Content - Coming soon message
+        # Main content area
         content = ctk.CTkFrame(self, fg_color='transparent')
         content.pack(fill='both', expand=True)
         
-        # Center container
-        center = ctk.CTkFrame(content, fg_color='transparent')
-        center.place(relx=0.5, rely=0.5, anchor='center')
-        
-        # Icon
-        icon_frame = ctk.CTkFrame(
-            center,
-            width=64,
-            height=64,
-            corner_radius=32,
-            fg_color=COLORS['border']
+        # Left sidebar - Components panel
+        left_panel = ctk.CTkScrollableFrame(
+            content,
+            width=250,
+            fg_color=COLORS['bg_medium'],
+            label_text="MIDAS Components",
+            label_font=("Arial", 11, "bold"),
+            label_text_color=COLORS['text_primary']
         )
-        icon_frame.pack()
-        icon_frame.pack_propagate(False)
+        left_panel.pack(side='left', fill='y', padx=0, pady=0)
         
-        icon_label = ctk.CTkLabel(
-            icon_frame,
-            text="⚡",
-            font=("Arial", 32),
-            text_color=COLORS['gold']
+        # Add component categories
+        self._add_component_category(left_panel, "Data Sources", ["📤 API", "🔄 Kafka", "🗄️ PostgreSQL"])
+        self._add_component_category(left_panel, "Processors", ["🔤 NLP", "📝 NLP", "⚙️ NLP", "💻 NLP"])
+        self._add_component_category(left_panel, "Models", ["🌲 Random Forest", "🌳 Random Forest"])
+        self._add_component_category(left_panel, "Actions", ["🔔 Notification", "📧 Output"])
+        self._add_component_category(left_panel, "Outputs", ["✉️ Notification", "📡 Remote"])
+        
+        # Center - Canvas area
+        center_panel = ctk.CTkFrame(content, fg_color=COLORS['bg_dark'])
+        center_panel.pack(side='left', fill='both', expand=True)
+        
+        # Drag and drop hint
+        hint_label = ctk.CTkLabel(
+            center_panel,
+            text="👻\n\nDrag and Drop\n\nDrag components from the left panel to build your workflow",
+            font=("Arial", 14),
+            text_color=COLORS['text_secondary'],
+            justify='center'
         )
-        icon_label.place(relx=0.5, rely=0.5, anchor='center')
+        hint_label.place(relx=0.5, rely=0.5, anchor='center')
         
-        # Message
-        message = ctk.CTkLabel(
-            center,
-            text="Workflow builder coming soon",
-            font=("Arial", 11),
+        # Right sidebar - Properties panel
+        right_panel = ctk.CTkScrollableFrame(
+            content,
+            width=280,
+            fg_color=COLORS['bg_medium'],
+            label_text="Node Properties",
+            label_font=("Arial", 11, "bold"),
+            label_text_color=COLORS['text_primary']
+        )
+        right_panel.pack(side='right', fill='y', padx=0, pady=0)
+        
+        # Add property fields
+        self._add_property_field(right_panel, "Model Version", "v2.1")
+        self._add_property_field(right_panel, "Threshold", "0.75")
+        self._add_property_field(right_panel, "Language", "English")
+        
+        # Workflow status section
+        status_frame = ctk.CTkFrame(right_panel, fg_color='transparent')
+        status_frame.pack(fill='x', pady=16)
+        
+        ctk.CTkLabel(
+            status_frame,
+            text="Workflow Status",
+            font=("Arial", 10, "bold"),
+            text_color=COLORS['text_primary']
+        ).pack(anchor='w')
+        
+        # Status details
+        status_details = ctk.CTkFrame(status_frame, fg_color='transparent')
+        status_details.pack(fill='x', pady=8)
+        
+        self._add_status_row(status_details, "Last Run", "12 mins ago")
+        self._add_status_row(status_details, "Status", "✓ Success", COLORS['green'])
+    
+    def _add_component_category(self, parent, title, components):
+        """Add a collapsible component category"""
+        category_frame = ctk.CTkFrame(parent, fg_color='transparent')
+        category_frame.pack(fill='x', pady=8)
+        
+        ctk.CTkLabel(
+            category_frame,
+            text=f"▼ {title}",
+            font=("Arial", 9, "bold"),
+            text_color=COLORS['text_primary']
+        ).pack(anchor='w', pady=4)
+        
+        # Component grid
+        comp_frame = ctk.CTkFrame(category_frame, fg_color='transparent')
+        comp_frame.pack(fill='x')
+        
+        for i, comp in enumerate(components):
+            btn = ctk.CTkButton(
+                comp_frame,
+                text=comp,
+                width=70,
+                height=50,
+                fg_color=COLORS['bg_dark'],
+                border_width=1,
+                border_color=COLORS['border_light'],
+                text_color=COLORS['text_primary'],
+                font=("Arial", 8),
+                hover_color=COLORS['border']
+            )
+            btn.grid(row=i//3, column=i%3, padx=2, pady=2)
+    
+    def _add_property_field(self, parent, label, value):
+        """Add a property field"""
+        field_frame = ctk.CTkFrame(parent, fg_color='transparent')
+        field_frame.pack(fill='x', pady=4)
+        
+        ctk.CTkLabel(
+            field_frame,
+            text=label,
+            font=("Arial", 9),
             text_color=COLORS['text_secondary']
-        )
-        message.pack(pady=(16, 0))
+        ).pack(anchor='w')
+        
+        ctk.CTkEntry(
+            field_frame,
+            fg_color=COLORS['bg_dark'],
+            border_color=COLORS['border_light'],
+            text_color=COLORS['text_primary'],
+            font=("Arial", 9)
+        ).pack(fill='x', pady=2)
+    
+    def _add_status_row(self, parent, label, value, color=None):
+        """Add a status row"""
+        row = ctk.CTkFrame(parent, fg_color='transparent')
+        row.pack(fill='x', pady=2)
+        
+        ctk.CTkLabel(
+            row,
+            text=label,
+            font=("Arial", 9),
+            text_color=COLORS['text_secondary']
+        ).pack(side='left')
+        
+        ctk.CTkLabel(
+            row,
+            text=value,
+            font=("Arial", 9),
+            text_color=color if color else COLORS['text_primary']
+        ).pack(side='right')
 
 
 class ExpertIntelligence(ctk.CTkFrame):
-    """Expert intelligence view"""
+    """Expert intelligence view - Reports & Findings Dashboard"""
     
     def __init__(self, parent):
-        super().__init__(parent, fg_color=COLORS['bg_light'])
+        super().__init__(parent, fg_color=COLORS['bg_dark'])
+        
+        # Main container with sidebar
+        main_container = ctk.CTkFrame(self, fg_color='transparent')
+        main_container.pack(fill='both', expand=True)
+        
+        # Left content area
+        left_content = ctk.CTkFrame(main_container, fg_color='transparent')
+        left_content.pack(side='left', fill='both', expand=True)
         
         # Header
-        header = ctk.CTkFrame(self, fg_color='transparent', height=56)
+        header = ctk.CTkFrame(left_content, fg_color='transparent', height=56)
         header.pack(fill='x', padx=0, pady=0)
         header.pack_propagate(False)
         
         header_label = ctk.CTkLabel(
             header,
-            text="Pen-İş Intelligence",  # Note: "Pen-İş" is Turkish for "Pen-work" (Penetration Testing Intelligence)
+            text="Amidas Framework - Reports & Findings",
             font=("Arial", 12),
             text_color=COLORS['text_primary']
         )
         header_label.pack(side='left', padx=24, pady=16)
         
         # Separator
-        separator = ctk.CTkFrame(self, fg_color=COLORS['border'], height=1)
+        separator = ctk.CTkFrame(left_content, fg_color=COLORS['border'], height=1)
         separator.pack(fill='x')
         
-        # Content - Coming soon message
-        content = ctk.CTkFrame(self, fg_color='transparent')
-        content.pack(fill='both', expand=True)
+        # Content with scroll
+        content = ctk.CTkScrollableFrame(left_content, fg_color='transparent')
+        content.pack(fill='both', expand=True, padx=16, pady=16)
         
-        # Center container
-        center = ctk.CTkFrame(content, fg_color='transparent')
-        center.place(relx=0.5, rely=0.5, anchor='center')
-        
-        # Icon
-        icon_frame = ctk.CTkFrame(
-            center,
-            width=64,
-            height=64,
-            corner_radius=32,
-            fg_color=COLORS['border']
+        # Findings Trend Chart
+        chart_frame = ctk.CTkFrame(
+            content,
+            fg_color=COLORS['bg_medium'],
+            corner_radius=8,
+            border_width=1,
+            border_color=COLORS['border']
         )
-        icon_frame.pack()
-        icon_frame.pack_propagate(False)
+        chart_frame.pack(fill='x', pady=(0, 16))
         
-        icon_label = ctk.CTkLabel(
-            icon_frame,
-            text="🧠",
-            font=("Arial", 32),
-            text_color=COLORS['gold']
-        )
-        icon_label.place(relx=0.5, rely=0.5, anchor='center')
+        chart_header = ctk.CTkFrame(chart_frame, fg_color='transparent')
+        chart_header.pack(fill='x', padx=16, pady=16)
         
-        # Message
-        message = ctk.CTkLabel(
-            center,
-            text="Intelligence dashboard coming soon",
-            font=("Arial", 11),
+        ctk.CTkLabel(
+            chart_header,
+            text="Findings Trend (Last 24 Hours)",
+            font=("Arial", 11, "bold"),
+            text_color=COLORS['text_primary']
+        ).pack(side='left')
+        
+        ctk.CTkLabel(
+            chart_header,
+            text="📅 Past 24 Hours",
+            font=("Arial", 9),
             text_color=COLORS['text_secondary']
+        ).pack(side='right')
+        
+        # Simple chart representation
+        chart_canvas = ctk.CTkFrame(
+            chart_frame,
+            fg_color=COLORS['bg_dark'],
+            height=120
         )
-        message.pack(pady=(16, 0))
+        chart_canvas.pack(fill='x', padx=16, pady=(0, 16))
+        
+        ctk.CTkLabel(
+            chart_canvas,
+            text="📊 Findings Trend Chart\n(Visualization showing threat activity over 24 hours)",
+            font=("Arial", 10),
+            text_color=COLORS['text_secondary']
+        ).place(relx=0.5, rely=0.5, anchor='center')
+        
+        # Recent Findings Table
+        table_frame = ctk.CTkFrame(
+            content,
+            fg_color=COLORS['bg_medium'],
+            corner_radius=8,
+            border_width=1,
+            border_color=COLORS['border']
+        )
+        table_frame.pack(fill='both', expand=True)
+        
+        table_header = ctk.CTkFrame(table_frame, fg_color='transparent')
+        table_header.pack(fill='x', padx=16, pady=16)
+        
+        ctk.CTkLabel(
+            table_header,
+            text="Recent Findings & Reports",
+            font=("Arial", 11, "bold"),
+            text_color=COLORS['text_primary']
+        ).pack(side='left')
+        
+        # Table columns header
+        columns_frame = ctk.CTkFrame(
+            table_frame,
+            fg_color=COLORS['bg_dark'],
+            height=40
+        )
+        columns_frame.pack(fill='x', padx=16)
+        columns_frame.pack_propagate(False)
+        
+        columns = ["ID", "Type", "Severity", "Asset/Source", "Date", "Status"]
+        for col in columns:
+            ctk.CTkLabel(
+                columns_frame,
+                text=col,
+                font=("Arial", 9, "bold"),
+                text_color=COLORS['text_secondary']
+            ).pack(side='left', expand=True, padx=4)
+        
+        # Sample findings
+        findings_data = [
+            ("101000.000000", "Prompt-Injection", "Critical", "AIPIblosses", "1/23/2021"),
+            ("103000.000090", "Prompt-Injection", "High", "Computer Security", "1/23/2021"),
+            ("113000.000093", "Application Report", "Medium", "Computer Security", "1/23/2021"),
+            ("131000.000005", "Recent Findings", "Low", "Finezie.bireman", "3/23/2021"),
+            ("133000.000005", "Prompt-Injection", "High", "Computer Security", "1/23/2021"),
+        ]
+        
+        for finding in findings_data:
+            self._add_finding_row(table_frame, finding)
+        
+        # Right sidebar - Overview
+        right_panel = ctk.CTkFrame(
+            main_container,
+            width=280,
+            fg_color=COLORS['bg_medium'],
+            border_width=1,
+            border_color=COLORS['border']
+        )
+        right_panel.pack(side='right', fill='y', padx=0, pady=0)
+        right_panel.pack_propagate(False)
+        
+        # Overview header
+        ctk.CTkLabel(
+            right_panel,
+            text="Overview",
+            font=("Arial", 11, "bold"),
+            text_color=COLORS['text_primary']
+        ).pack(padx=16, pady=16, anchor='w')
+        
+        # Critical Findings card
+        self._add_stat_card(right_panel, "Critical Findings", "25", COLORS['red'])
+        
+        # High Risk Assets card
+        self._add_stat_card(right_panel, "High Risk Assets", "7", COLORS['yellow'])
+        
+        # Generated Reports card
+        self._add_stat_card(right_panel, "Generated Reports", "48", COLORS['blue'])
+        
+        # Risk Distribution
+        risk_frame = ctk.CTkFrame(right_panel, fg_color='transparent')
+        risk_frame.pack(fill='x', padx=16, pady=16)
+        
+        ctk.CTkLabel(
+            risk_frame,
+            text="Risk Distribution",
+            font=("Arial", 10, "bold"),
+            text_color=COLORS['text_primary']
+        ).pack(anchor='w', pady=(0, 8))
+        
+        # Risk bars
+        self._add_risk_bar(risk_frame, "Critical", 25, COLORS['red'])
+        self._add_risk_bar(risk_frame, "High Risk", 7, COLORS['yellow'])
+        self._add_risk_bar(risk_frame, "Medium", 10, COLORS['blue'])
+        self._add_risk_bar(risk_frame, "Low", 3, COLORS['green'])
+    
+    def _add_finding_row(self, parent, data):
+        """Add a finding row to the table"""
+        row = ctk.CTkFrame(
+            parent,
+            fg_color=COLORS['bg_dark'],
+            height=36
+        )
+        row.pack(fill='x', padx=16, pady=1)
+        row.pack_propagate(False)
+        
+        # ID
+        ctk.CTkLabel(
+            row,
+            text=data[0],
+            font=("Arial", 8),
+            text_color=COLORS['text_primary']
+        ).pack(side='left', expand=True, padx=4)
+        
+        # Type
+        ctk.CTkLabel(
+            row,
+            text=data[1],
+            font=("Arial", 8),
+            text_color=COLORS['text_primary']
+        ).pack(side='left', expand=True, padx=4)
+        
+        # Severity badge
+        severity_colors = {
+            'Critical': COLORS['red'],
+            'High': COLORS['yellow'],
+            'Medium': COLORS['blue'],
+            'Low': COLORS['green']
+        }
+        
+        severity_label = ctk.CTkLabel(
+            row,
+            text=data[2],
+            font=("Arial", 8, "bold"),
+            text_color='white',
+            fg_color=severity_colors.get(data[2], COLORS['text_secondary']),
+            corner_radius=4,
+            width=60,
+            height=20
+        )
+        severity_label.pack(side='left', expand=True, padx=4)
+        
+        # Asset
+        ctk.CTkLabel(
+            row,
+            text=data[3],
+            font=("Arial", 8),
+            text_color=COLORS['text_primary']
+        ).pack(side='left', expand=True, padx=4)
+        
+        # Date
+        ctk.CTkLabel(
+            row,
+            text=data[4],
+            font=("Arial", 8),
+            text_color=COLORS['text_secondary']
+        ).pack(side='left', expand=True, padx=4)
+        
+        # Status
+        ctk.CTkLabel(
+            row,
+            text="Download",
+            font=("Arial", 8),
+            text_color=COLORS['text_primary']
+        ).pack(side='left', expand=True, padx=4)
+    
+    def _add_stat_card(self, parent, label, value, color):
+        """Add a statistics card"""
+        card = ctk.CTkFrame(
+            parent,
+            fg_color=COLORS['bg_dark'],
+            corner_radius=8,
+            border_width=1,
+            border_color=COLORS['border_light']
+        )
+        card.pack(fill='x', padx=16, pady=4)
+        
+        ctk.CTkLabel(
+            card,
+            text=label,
+            font=("Arial", 9),
+            text_color=COLORS['text_secondary']
+        ).pack(padx=12, pady=(12, 4), anchor='w')
+        
+        ctk.CTkLabel(
+            card,
+            text=value,
+            font=("Arial", 24, "bold"),
+            text_color=color
+        ).pack(padx=12, pady=(0, 12), anchor='w')
+    
+    def _add_risk_bar(self, parent, label, value, color):
+        """Add a risk distribution bar"""
+        bar_frame = ctk.CTkFrame(parent, fg_color='transparent')
+        bar_frame.pack(fill='x', pady=4)
+        
+        # Label and value
+        label_frame = ctk.CTkFrame(bar_frame, fg_color='transparent')
+        label_frame.pack(fill='x')
+        
+        ctk.CTkLabel(
+            label_frame,
+            text=label,
+            font=("Arial", 8),
+            text_color=COLORS['text_secondary']
+        ).pack(side='left')
+        
+        ctk.CTkLabel(
+            label_frame,
+            text=str(value),
+            font=("Arial", 8),
+            text_color=COLORS['text_primary']
+        ).pack(side='right')
+        
+        # Progress bar
+        progress = ctk.CTkProgressBar(
+            bar_frame,
+            width=240,
+            height=8,
+            corner_radius=4,
+            fg_color=COLORS['bg_dark'],
+            progress_color=color
+        )
+        progress.pack(fill='x', pady=2)
+        progress.set(value / 25)  # Normalize to 0-1 range
 
 
 class MidasProApp(ctk.CTk):
