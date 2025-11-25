@@ -2,15 +2,17 @@ import { useState } from 'react';
 import { CommandPanel } from './components/CommandPanel';
 import { OrchestrationWorkflow } from './components/OrchestrationWorkflow';
 import { ExpertIntelligence } from './components/ExpertIntelligence';
+import { ExploitBuilder } from './components/ExploitBuilder';
 import { SplashScreen } from './components/SplashScreen';
-import { Shield, Cpu, Brain, Settings, Bell, Users, ChevronRight } from 'lucide-react';
+import { Shield, Cpu, Brain, Settings, Bell, Users, ChevronRight, Code } from 'lucide-react';
 import { Button } from './components/ui/button';
 
 const Sidebar = ({ activeTab, setActiveTab }: { activeTab: string; setActiveTab: (tab: string) => void }) => {
   const menuItems = [
     { id: 'command', icon: Shield, label: 'Dashboard' },
     { id: 'orchestration', icon: Cpu, label: 'Workflow' },
-    { id: 'intelligence', icon: Brain, label: 'Intelligence' },
+    { id: 'exploit', icon: Code, label: 'Exploit Builder' },
+    { id: 'intelligence', icon: Brain, label: 'Reports' },
   ];
 
   return (
@@ -99,6 +101,7 @@ export default function App() {
           <div className="flex-1 bg-[#121218] overflow-hidden">
             {activeTab === 'command' && <CommandPanel />}
             {activeTab === 'orchestration' && <OrchestrationWorkflow />}
+            {activeTab === 'exploit' && <ExploitBuilder />}
             {activeTab === 'intelligence' && <ExpertIntelligence />}
           </div>
         </div>
