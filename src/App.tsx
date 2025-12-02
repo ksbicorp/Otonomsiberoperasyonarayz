@@ -1,10 +1,25 @@
 import { useState } from 'react';
+import { CommandPanel } from './components/CommandPanel';
+import { OrchestrationWorkflow } from './components/OrchestrationWorkflow';
+import { ExpertIntelligence } from './components/ExpertIntelligence';
 import { SplashScreen } from './components/SplashScreen';
 import { ChatInterface } from './components/ChatInterface';
-import { MessageSquare, HelpCircle, Info } from 'lucide-react';
+import { Shield, Cpu, Brain, HelpCircle, MessageSquare, Info } from 'lucide-react';
 import midasIcon from 'figma:asset/08254c82b6201befe291f432d77014ac201e4b01.png';
 
-const Sidebar = ({ showHelp, setShowHelp }: { showHelp: boolean; setShowHelp: (show: boolean) => void }) => {
+const Sidebar = ({ activeTab, setActiveTab, showHelp, setShowHelp }: { 
+  activeTab: string; 
+  setActiveTab: (tab: string) => void;
+  showHelp: boolean;
+  setShowHelp: (show: boolean) => void;
+}) => {
+  const menuItems = [
+    { id: 'chat', icon: MessageSquare, label: 'Asistan' },
+    { id: 'dashboard', icon: Shield, label: 'Gösterge Paneli' },
+    { id: 'workflow', icon: Cpu, label: 'İş Akışı' },
+    { id: 'intelligence', icon: Brain, label: 'İstihbarat' },
+  ];
+
   return (
     <div className="w-14 bg-[#0a0a0f] border-r border-[#1e1e24] flex flex-col items-center py-4 gap-3">
       {/* Logo - Midas King Icon */}
@@ -16,13 +31,21 @@ const Sidebar = ({ showHelp, setShowHelp }: { showHelp: boolean; setShowHelp: (s
         />
       </div>
 
-      {/* Ana Sayfa */}
-      <button
-        className="w-9 h-9 rounded-lg flex items-center justify-center bg-[#1e1e24] text-[#d4af37]"
-        title="Ana Sayfa"
-      >
-        <MessageSquare className="w-5 h-5" />
-      </button>
+      {/* Menu Items */}
+      {menuItems.map((item) => (
+        <button
+          key={item.id}
+          onClick={() => setActiveTab(item.id)}
+          className={`w-9 h-9 rounded-lg flex items-center justify-center transition-colors ${
+            activeTab === item.id
+              ? 'bg-[#1e1e24] text-[#d4af37]'
+              : 'text-[#6b6b75] hover:text-[#e8e8ea] hover:bg-[#1e1e24]'
+          }`}
+          title={item.label}
+        >
+          <item.icon className="w-5 h-5" />
+        </button>
+      ))}
 
       {/* Bottom Items */}
       <div className="mt-auto space-y-3">
@@ -94,6 +117,7 @@ const HelpPanel = () => {
 };
 
 export default function App() {
+  const [activeTab, setActiveTab] = useState('chat');
   const [showSplash, setShowSplash] = useState(true);
   const [showHelp, setShowHelp] = useState(false);
 
@@ -131,10 +155,13 @@ export default function App() {
 
         {/* Main Content */}
         <div className="flex-1 flex overflow-hidden">
-          <Sidebar showHelp={showHelp} setShowHelp={setShowHelp} />
+          <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} showHelp={showHelp} setShowHelp={setShowHelp} />
           
           <div className="flex-1 bg-[#121218] overflow-hidden">
-            <ChatInterface />
+            {activeTab === 'chat' && <ChatInterface />}
+            {activeTab === 'dashboard' && <CommandPanel />}
+            {activeTab === 'workflow' && <OrchestrationWorkflow />}
+            {activeTab === 'intelligence' && <ExpertIntelligence />}
           </div>
 
           {showHelp && <HelpPanel />}
