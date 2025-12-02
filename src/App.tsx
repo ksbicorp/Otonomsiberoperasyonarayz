@@ -2,29 +2,29 @@ import { useState } from 'react';
 import { CommandPanel } from './components/CommandPanel';
 import { OrchestrationWorkflow } from './components/OrchestrationWorkflow';
 import { ExpertIntelligence } from './components/ExpertIntelligence';
-import { ExploitBuilder } from './components/ExploitBuilder';
 import { SplashScreen } from './components/SplashScreen';
-import { Shield, Cpu, Brain, Settings, Bell, Users, ChevronRight, Code } from 'lucide-react';
+import { ChatInterface } from './components/ChatInterface';
+import { Shield, Cpu, Brain, Settings, Bell, Users, MessageSquare } from 'lucide-react';
 import { Button } from './components/ui/button';
+import midasIcon from 'figma:asset/08254c82b6201befe291f432d77014ac201e4b01.png';
 
 const Sidebar = ({ activeTab, setActiveTab }: { activeTab: string; setActiveTab: (tab: string) => void }) => {
   const menuItems = [
+    { id: 'chat', icon: MessageSquare, label: 'Web-IO' },
     { id: 'command', icon: Shield, label: 'Dashboard' },
     { id: 'orchestration', icon: Cpu, label: 'Workflow' },
-    { id: 'exploit', icon: Code, label: 'Exploit Builder' },
-    { id: 'intelligence', icon: Brain, label: 'Reports' },
+    { id: 'intelligence', icon: Brain, label: 'Intelligence' },
   ];
 
   return (
     <div className="w-14 bg-[#0a0a0f] border-r border-[#1e1e24] flex flex-col items-center py-4 gap-3">
-      {/* Logo - M instead of Shield */}
-      <div className="w-9 h-9 bg-gradient-to-br from-[#ffd700] via-[#d4af37] to-[#b8941e] rounded-lg flex items-center justify-center mb-4">
-        <span 
-          className="text-xl text-black tracking-tighter"
-          style={{ fontFamily: 'Georgia, serif', fontWeight: 'bold' }}
-        >
-          M
-        </span>
+      {/* Logo - Midas King Icon */}
+      <div className="w-9 h-9 rounded-lg flex items-center justify-center mb-4 overflow-hidden">
+        <img 
+          src={midasIcon} 
+          alt="MIDAS" 
+          className="w-full h-full object-cover"
+        />
       </div>
 
       {/* Menu Items */}
@@ -60,7 +60,7 @@ const Sidebar = ({ activeTab, setActiveTab }: { activeTab: string; setActiveTab:
 };
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState('command');
+  const [activeTab, setActiveTab] = useState('chat');
   const [showSplash, setShowSplash] = useState(true);
 
   if (showSplash) {
@@ -99,9 +99,9 @@ export default function App() {
           <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
           
           <div className="flex-1 bg-[#121218] overflow-hidden">
+            {activeTab === 'chat' && <ChatInterface />}
             {activeTab === 'command' && <CommandPanel />}
             {activeTab === 'orchestration' && <OrchestrationWorkflow />}
-            {activeTab === 'exploit' && <ExploitBuilder />}
             {activeTab === 'intelligence' && <ExpertIntelligence />}
           </div>
         </div>
