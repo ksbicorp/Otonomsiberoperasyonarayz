@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Send, Cpu, Zap, CheckCircle2, AlertCircle, Loader2, Terminal, Brain, Shield } from 'lucide-react';
+import { Send, Loader2, Sparkles, Search, Shield, Zap } from 'lucide-react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Badge } from './ui/badge';
@@ -17,25 +17,17 @@ interface Message {
 const initialMessages: Message[] = [
   {
     id: 1,
-    type: 'system',
-    content: 'MIDAS PRO Otonom Siber Operasyon Platformu',
-    timestamp: new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }),
-    status: 'complete'
-  },
-  {
-    id: 2,
     type: 'assistant',
-    content: 'Merhaba! Ben MIDAS Web-IO. Size nasıl yardımcı olabilirim?\n\nŞunları yapabilirim:\n• Hedef sistemleri tarayıp zafiyet tespiti\n• Otomatik exploit geliştirme\n• Penetrasyon testi senaryoları oluşturma\n• Güvenlik açığı raporları hazırlama\n\nNe yapmamı istersiniz?',
+    content: 'Merhaba! 👋\n\nBen MIDAS, siber güvenlik asistanınız. Size yardımcı olmak için buradayım.\n\nBana doğal dilde ne yapmak istediğinizi söyleyin, gerisini ben hallederim. Örneğin:\n\n• "Ağımdaki cihazları göster"\n• "Web sitem güvenli mi kontrol et"\n• "Açık portları tara"\n\nNe yapmamı istersiniz?',
     timestamp: new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }),
     status: 'complete'
   }
 ];
 
 const suggestionChips = [
-  { label: '192.168.1.0/24 ağını tara', icon: Terminal },
-  { label: 'Web uygulaması zafiyet analizi', icon: Shield },
-  { label: 'SQL injection testi yap', icon: Zap },
-  { label: 'Otomatik exploit geliştir', icon: Brain },
+  { label: 'Ağımı tara', icon: Search, description: 'Ağınızdaki cihazları keşfedin' },
+  { label: 'Güvenlik kontrolü yap', icon: Shield, description: 'Sisteminizdeki açıkları tespit edin' },
+  { label: 'Hızlı tarama başlat', icon: Zap, description: 'Temel güvenlik taraması' },
 ];
 
 export function ChatInterface() {
@@ -55,7 +47,7 @@ export function ChatInterface() {
   const simulateResponse = (userMessage: string) => {
     setIsTyping(true);
 
-    // Thinking message
+    // Düşünme mesajı
     setTimeout(() => {
       const thinkingMsg: Message = {
         id: Date.now(),
@@ -66,33 +58,32 @@ export function ChatInterface() {
       };
       setMessages(prev => [...prev, thinkingMsg]);
 
-      // Response after thinking
+      // Cevap oluştur
       setTimeout(() => {
         setMessages(prev => prev.filter(m => m.status !== 'thinking'));
         
         let response = '';
         let actions: Array<{ label: string; type: string; }> = [];
 
-        if (userMessage.toLowerCase().includes('tara') || userMessage.toLowerCase().includes('scan')) {
-          response = '✓ Hedef sistem analiz edildi.\n\n**Tespit Edilen Bilgiler:**\n• 42 aktif host\n• 156 açık port\n• 8 web servisi\n• 3 kritik zafiyet\n\n**Önerilen Araçlar:**\n• Nmap (port tarama)\n• Nikto (web sunucu analizi)\n• Metasploit (exploit geliştirme)\n\n**İşlem Planı Oluşturuldu:**\n1. Port tarama (Nmap)\n2. Servis tespiti\n3. Zafiyet analizi\n4. Exploit geliştirme\n\nOperasyonu başlatmamı ister misiniz?';
+        if (userMessage.toLowerCase().includes('tara') || userMessage.toLowerCase().includes('ağ') || userMessage.toLowerCase().includes('scan')) {
+          response = '✅ Anladım! Ağınızı taramak istiyorsunuz.\n\n**Tespit Edilen Bilgiler:**\n• 42 aktif cihaz bulundu\n• 156 açık port tespit edildi\n• 3 potansiyel risk belirlendi\n\n**Yapılacaklar:**\n1. Detaylı cihaz listesi hazırlanacak\n2. Açık portlar analiz edilecek\n3. Güvenlik raporu oluşturulacak\n\nDevam etmemi ister misiniz?';
           actions = [
-            { label: 'Operasyonu Başlat', type: 'start' },
+            { label: 'Evet, Devam Et', type: 'start' },
             { label: 'Detaylı Rapor', type: 'report' }
           ];
-        } else if (userMessage.toLowerCase().includes('web') || userMessage.toLowerCase().includes('zafiyet')) {
-          response = '✓ Web uygulama analizi planı oluşturuldu.\n\n**Hedef:** target-app.com\n**Planlanan Testler:**\n• SQL Injection (SQLMap)\n• XSS (Burp Suite)\n• CSRF token analizi\n• Authentication bypass\n• Directory traversal\n\n**Kullanılacak Araçlar:**\n• Burp Suite Professional\n• OWASP ZAP\n• SQLMap\n• Nikto\n\n**Tahmini Süre:** 2-4 saat\n\nOperasyonu onaylıyor musunuz?';
+        } else if (userMessage.toLowerCase().includes('güvenlik') || userMessage.toLowerCase().includes('kontrol') || userMessage.toLowerCase().includes('güvenli')) {
+          response = '✅ Güvenlik kontrolü başlatılıyor.\n\n**Yapılacak Kontroller:**\n• Açık port taraması\n• Güncel olmayan yazılım tespiti\n• Şifre güvenliği kontrolü\n• Firewall durumu\n\n**Tahmini Süre:** 2-5 dakika\n\nBaşlatalım mı?';
           actions = [
-            { label: 'Operasyonu Onayla', type: 'start' },
-            { label: 'Planı Düzenle', type: 'edit' }
+            { label: 'Kontrolü Başlat', type: 'start' },
+            { label: 'Ayarları Değiştir', type: 'edit' }
           ];
-        } else if (userMessage.toLowerCase().includes('sql') || userMessage.toLowerCase().includes('injection')) {
-          response = '✓ SQL Injection testi hazırlandı.\n\n**Hedef Parametreler:**\n• Login formu\n• Search query\n• Product ID\n\n**Test Stratejisi:**\n• Union-based injection\n• Boolean-based blind\n• Time-based blind\n• Error-based\n\n**Araçlar:**\n• SQLMap (otomatik)\n• Manuel payload testleri\n\nTest başlatılsın mı?';
+        } else if (userMessage.toLowerCase().includes('hızlı') || userMessage.toLowerCase().includes('basit')) {
+          response = '✅ Hızlı tarama modu hazır.\n\n**Bu Tarama Şunları İçerir:**\n• Temel port kontrolü\n• Aktif cihaz tespiti\n• Basit güvenlik analizi\n\n**Tahmini Süre:** 1 dakika\n\nBaşlamak için onaylayın.';
           actions = [
-            { label: 'Testi Başlat', type: 'start' },
-            { label: 'Parametreleri Özelleştir', type: 'edit' }
+            { label: 'Başlat', type: 'start' }
           ];
         } else {
-          response = 'Talebinizi aldım. Size en uygun operasyon planını oluşturuyorum.\n\nBu işlem için şu araçları kullanabilirim:\n• Nmap, Masscan (keşif)\n• Burp Suite, ZAP (web testi)\n• Metasploit (exploit)\n• SQLMap (veritabanı)\n\nDaha fazla detay verebilir misiniz?';
+          response = 'Talebinizi aldım! 🎯\n\nSize en iyi şekilde yardımcı olmak istiyorum.\n\nLütfen şunlardan birini seçin veya ne yapmak istediğinizi daha detaylı açıklayın:\n\n• Ağ taraması\n• Güvenlik kontrolü\n• Port analizi\n• Sistem durumu';
         }
 
         const responseMsg: Message = {
@@ -106,8 +97,8 @@ export function ChatInterface() {
 
         setMessages(prev => [...prev, responseMsg]);
         setIsTyping(false);
-      }, 2000);
-    }, 500);
+      }, 1500);
+    }, 400);
   };
 
   const handleSend = () => {
@@ -132,26 +123,20 @@ export function ChatInterface() {
 
   const handleActionClick = (action: { label: string; type: string; }) => {
     if (action.type === 'start') {
-      // Add system message
       const systemMsg: Message = {
         id: Date.now(),
         type: 'system',
-        content: '⚡ Operasyon başlatılıyor...\n\n• Araçlar yükleniyor\n• Workflow oluşturuluyor\n• Gemini AI aktif\n\nDashboard\'a yönlendiriliyorsunuz.',
+        content: '⚡ İşlem başlatılıyor...\n\nGerekli araçlar hazırlanıyor. Lütfen bekleyin.',
         timestamp: new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }),
         status: 'complete'
       };
       setMessages(prev => [...prev, systemMsg]);
-
-      // Redirect to dashboard after 2 seconds
-      setTimeout(() => {
-        // Add your redirection logic here
-      }, 2000);
     }
   };
 
   return (
     <div className="h-full flex flex-col">
-      {/* Header */}
+      {/* Header - Basitleştirilmiş */}
       <div className="h-14 px-6 flex items-center justify-between border-b border-[#1e1e24]">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 rounded-lg overflow-hidden">
@@ -159,29 +144,25 @@ export function ChatInterface() {
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-sm text-[#e8e8ea]">MIDAS Web-IO</span>
-              <Badge variant="outline" className="border-[#00d4ff] text-[#00d4ff] text-xs">
-                <div className="w-1.5 h-1.5 bg-[#00d4ff] rounded-full mr-1 animate-pulse"></div>
-                Online
+              <span className="text-sm text-[#e8e8ea]">MIDAS Asistan</span>
+              <Badge variant="outline" className="border-[#28c840] text-[#28c840] text-xs">
+                <div className="w-1.5 h-1.5 bg-[#28c840] rounded-full mr-1 animate-pulse"></div>
+                Hazır
               </Badge>
             </div>
-            <div className="text-xs text-[#6b6b75]">Otonom Siber Operasyon Asistanı</div>
+            <div className="text-xs text-[#6b6b75]">Doğal dilde komut verin</div>
           </div>
         </div>
 
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#1a1a20] border border-[#2d2d35]">
-            <Cpu className="w-3 h-3 text-[#a855f7]" />
-            <span className="text-xs text-[#e8e8ea]">Gemini AI</span>
-          </div>
-          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#1a1a20] border border-[#2d2d35]">
-            <Shield className="w-3 h-3 text-[#4a9eff]" />
-            <span className="text-xs text-[#e8e8ea]">344 Services</span>
+            <Sparkles className="w-3 h-3 text-[#d4af37]" />
+            <span className="text-xs text-[#e8e8ea]">Yapay Zeka Destekli</span>
           </div>
         </div>
       </div>
 
-      {/* Messages Area */}
+      {/* Mesaj Alanı */}
       <div className="flex-1 overflow-auto p-6 space-y-4">
         {messages.map((message) => (
           <div
@@ -189,29 +170,16 @@ export function ChatInterface() {
             className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
           >
             <div className={`max-w-[80%] ${message.type === 'user' ? 'order-2' : 'order-1'}`}>
-              {/* Message bubble */}
+              {/* Mesaj balonu */}
               <div
                 className={`p-4 rounded-lg ${
                   message.type === 'user'
                     ? 'bg-gradient-to-r from-[#d4af37] to-[#b8941e] text-black'
                     : message.type === 'system'
-                    ? 'bg-[#1a1a20] border border-[#2d2d35]'
+                    ? 'bg-[#1a1a20] border border-[#d4af37]/30'
                     : 'bg-[#1a1a20] border border-[#2d2d35]'
                 }`}
               >
-                {message.type !== 'user' && (
-                  <div className="flex items-center gap-2 mb-2">
-                    {message.type === 'system' ? (
-                      <Terminal className="w-4 h-4 text-[#d4af37]" />
-                    ) : (
-                      <Brain className="w-4 h-4 text-[#a855f7]" />
-                    )}
-                    <span className="text-xs text-[#6b6b75]">
-                      {message.type === 'system' ? 'SYSTEM' : 'MIDAS Web-IO'}
-                    </span>
-                  </div>
-                )}
-                
                 <div className={`whitespace-pre-line ${
                   message.type === 'user' ? 'text-black' : 'text-[#e8e8ea]'
                 }`}>
@@ -220,12 +188,12 @@ export function ChatInterface() {
 
                 {message.status === 'thinking' && (
                   <div className="flex items-center gap-2 mt-2">
-                    <Loader2 className="w-4 h-4 text-[#a855f7] animate-spin" />
-                    <span className="text-xs text-[#6b6b75]">Analiz ediliyor...</span>
+                    <Loader2 className="w-4 h-4 text-[#d4af37] animate-spin" />
+                    <span className="text-xs text-[#6b6b75]">Düşünüyorum...</span>
                   </div>
                 )}
 
-                {/* Action buttons */}
+                {/* Aksiyon butonları */}
                 {message.actions && message.actions.length > 0 && (
                   <div className="flex gap-2 mt-4">
                     {message.actions.map((action, idx) => (
@@ -239,7 +207,6 @@ export function ChatInterface() {
                             : 'bg-[#2d2d35] hover:bg-[#3d3d45] text-[#e8e8ea]'
                         }`}
                       >
-                        {action.type === 'start' && <Zap className="w-3 h-3 mr-1" />}
                         {action.label}
                       </Button>
                     ))}
@@ -247,7 +214,7 @@ export function ChatInterface() {
                 )}
               </div>
 
-              {/* Timestamp */}
+              {/* Zaman damgası */}
               <div className={`text-xs text-[#6b6b75] mt-1 ${
                 message.type === 'user' ? 'text-right' : 'text-left'
               }`}>
@@ -272,9 +239,9 @@ export function ChatInterface() {
             <div className="p-4 rounded-lg bg-[#1a1a20] border border-[#2d2d35]">
               <div className="flex items-center gap-2">
                 <div className="flex gap-1">
-                  <div className="w-2 h-2 bg-[#a855f7] rounded-full animate-bounce"></div>
-                  <div className="w-2 h-2 bg-[#a855f7] rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                  <div className="w-2 h-2 bg-[#a855f7] rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                  <div className="w-2 h-2 bg-[#d4af37] rounded-full animate-bounce"></div>
+                  <div className="w-2 h-2 bg-[#d4af37] rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                  <div className="w-2 h-2 bg-[#d4af37] rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
                 </div>
               </div>
             </div>
@@ -284,45 +251,49 @@ export function ChatInterface() {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Suggestion Chips */}
-      {messages.length === 2 && (
-        <div className="px-6 pb-3">
-          <div className="flex flex-wrap gap-2">
+      {/* Öneri Kartları - Sadece başlangıçta göster */}
+      {messages.length === 1 && (
+        <div className="px-6 pb-4">
+          <div className="text-xs text-[#6b6b75] mb-3">💡 Hızlı Başlangıç</div>
+          <div className="grid grid-cols-3 gap-3">
             {suggestionChips.map((chip, idx) => (
               <button
                 key={idx}
                 onClick={() => handleSuggestionClick(chip.label)}
-                className="px-3 py-2 rounded-lg bg-[#1a1a20] border border-[#2d2d35] hover:border-[#d4af37] transition-all flex items-center gap-2"
+                className="p-4 rounded-lg bg-[#1a1a20] border border-[#2d2d35] hover:border-[#d4af37] transition-all text-left group"
               >
-                <chip.icon className="w-3 h-3 text-[#d4af37]" />
-                <span className="text-xs text-[#e8e8ea]">{chip.label}</span>
+                <div className="flex items-center gap-2 mb-2">
+                  <chip.icon className="w-4 h-4 text-[#d4af37] group-hover:scale-110 transition-transform" />
+                  <span className="text-sm text-[#e8e8ea]">{chip.label}</span>
+                </div>
+                <p className="text-xs text-[#6b6b75]">{chip.description}</p>
               </button>
             ))}
           </div>
         </div>
       )}
 
-      {/* Input Area */}
+      {/* Giriş Alanı - Basitleştirilmiş */}
       <div className="p-4 border-t border-[#1e1e24] bg-[#0a0a0f]">
         <div className="flex gap-2">
           <Input
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyPress={(e) => e.key === 'Enter' && handleSend()}
-            placeholder="Operasyon talebi yazın... (örn: 192.168.1.0/24 ağını tara)"
+            placeholder="Ne yapmak istiyorsunuz? (Türkçe yazabilirsiniz)"
             className="flex-1 bg-[#1a1a20] border-[#2d2d35] text-[#e8e8ea] placeholder:text-[#6b6b75]"
             disabled={isTyping}
           />
           <Button
             onClick={handleSend}
             disabled={!input.trim() || isTyping}
-            className="bg-gradient-to-r from-[#d4af37] to-[#b8941e] hover:from-[#b8941e] hover:to-[#d4af37] text-black"
+            className="bg-gradient-to-r from-[#d4af37] to-[#b8941e] hover:from-[#b8941e] hover:to-[#d4af37] text-black px-6"
           >
             <Send className="w-4 h-4" />
           </Button>
         </div>
-        <div className="text-xs text-[#6b6b75] mt-2">
-          💡 Doğal dilde talimat verebilirsiniz. MIDAS Web-IO talebinizi analiz edip uygun operasyonu başlatacak.
+        <div className="text-xs text-[#6b6b75] mt-2 text-center">
+          Sadece yazmak istediğinizi yazın • Teknik bilgi gerekmez
         </div>
       </div>
     </div>

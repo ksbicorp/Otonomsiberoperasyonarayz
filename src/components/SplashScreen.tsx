@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import matrixBg from 'figma:asset/61bef0e19d3eeede28d3daef30cce7ab726e97b2.png';
 
 interface SplashScreenProps {
   onComplete: () => void;
@@ -16,7 +15,7 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
           setTimeout(onComplete, 500);
           return 100;
         }
-        return prev + 2;
+        return prev + 4;
       });
     }, 30);
 
@@ -25,18 +24,21 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
 
   return (
     <div className="fixed inset-0 bg-black flex items-center justify-center overflow-hidden">
-      {/* Matrix Background */}
+      {/* Gradient Background */}
       <div 
-        className="absolute inset-0 opacity-40"
+        className="absolute inset-0"
         style={{
-          backgroundImage: `url(${matrixBg})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center'
+          background: 'radial-gradient(ellipse at center, #0a0a0f 0%, #000000 100%)'
         }}
       />
 
-      {/* Overlay gradient */}
-      <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/40 to-black/80" />
+      {/* Golden glow effect */}
+      <div 
+        className="absolute inset-0 opacity-20"
+        style={{
+          background: 'radial-gradient(circle at 50% 50%, rgba(212, 175, 55, 0.3) 0%, transparent 50%)'
+        }}
+      />
 
       {/* Content */}
       <div className="relative z-10 text-center">
@@ -54,19 +56,18 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
 
         {/* Midas Pro Text */}
         <h1 
-          className="text-6xl mb-4 bg-gradient-to-r from-[#ffd700] via-[#ffed4e] to-[#ffd700] bg-clip-text text-transparent animate-pulse"
+          className="text-6xl mb-4 bg-gradient-to-r from-[#ffd700] via-[#ffed4e] to-[#ffd700] bg-clip-text text-transparent"
           style={{ 
             fontFamily: 'Georgia, serif',
             fontWeight: 'bold',
-            letterSpacing: '0.05em',
-            textShadow: '0 0 40px rgba(255, 215, 0, 0.5)'
+            letterSpacing: '0.05em'
           }}
         >
           Midas Pro
         </h1>
 
         <p className="text-sm text-gray-400 mb-12 tracking-widest">
-          AUTONOMOUS CYBER OPERATIONS COMMAND CENTER
+          OTONOM SİBER OPERASYON PLATFORMU
         </p>
 
         {/* Progress Bar */}
@@ -78,7 +79,7 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
             />
           </div>
           <div className="mt-3 flex justify-between text-xs text-gray-500">
-            <span>Initializing Systems</span>
+            <span>Sistemler Başlatılıyor</span>
             <span>{progress}%</span>
           </div>
         </div>
